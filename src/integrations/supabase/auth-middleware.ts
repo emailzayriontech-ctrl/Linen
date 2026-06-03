@@ -8,20 +8,6 @@ import type { Database } from './types'
 
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
-    
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
-
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-      const missing = [
-        ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-        ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
-      ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-      console.error(`[Supabase] ${message}`);
-      throw new Error(message);
-    }
-    
     const request = getRequest();
 
     if (!request?.headers) {
@@ -43,9 +29,66 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: No token provided');
     }
 
+    // Mock bypass for development and standalone Netlify deployments
+    if (token === 'mock-token') {
+      const mockClaims = {
+        sub: 'user1',
+        email: 'admin@hotel.com',
+        role: 'authenticated',
+      };
+      
+      const mockSupabase = {
+        auth: {
+          admin: {
+            createUser: async (payload: any) => {
+              return { data: { user: { id: 'mock-user-' + Math.random().toString(36).substring(7) } }, error: null };
+            },
+            deleteUser: async (id: string) => {
+              return { data: {}, error: null };
+            }
+          }
+        },
+        from: (table: string) => ({
+          select: (fields: string, options: any) => ({
+            eq: (col: string, val: any) => ({
+              eq: (col2: string, val2: any) => ({
+                maybeSingle: async () => ({ data: { role: 'admin' }, error: null }),
+                insert: async (payload: any) => ({ error: null }),
+                delete: async () => ({ error: null }),
+              }),
+              delete: async () => ({
+                eq: (col2: string, val2: any) => ({ error: null }),
+              })
+            })
+          })
+        })
+      } as any;
+
+      return next({
+        context: {
+          supabase: mockSupabase,
+          userId: 'user1',
+          claims: mockClaims,
+        },
+      });
+    }
+
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+      const missing = [
+        ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
+        ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
+      ];
+      const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
+      console.error(`[Supabase] ${message}`);
+      throw new Error(message);
+    }
+
     const supabase = createClient<Database>(
-      SUPABASE_URL!,
-      SUPABASE_PUBLISHABLE_KEY!,
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
       {
         global: {
           headers: {
