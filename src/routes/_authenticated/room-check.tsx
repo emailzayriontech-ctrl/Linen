@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { today, fmtDate } from "@/lib/format";
 import { Plus, CheckCheck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 
 import { z } from "zod";
 
@@ -276,40 +277,109 @@ function RoomCheckPage() {
               {lines.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Klik "Sesuai Standar" untuk mengisi otomatis berdasarkan tipe kamar.</p>
               ) : (
-                <div className="border rounded-md overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Item</TableHead>
-                        <TableHead className="w-20">Std</TableHead>
-                        <TableHead className="w-24">Actual</TableHead>
-                        <TableHead className="w-36">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {lines.map((l, i) => (
-                        <TableRow key={l.linen_item_id}>
-                          <TableCell>{l.item_name}</TableCell>
-                          <TableCell>{l.standard_qty}</TableCell>
-                          <TableCell>
-                            <Input type="number" min={0} value={l.actual_qty}
-                              onChange={(e) => setLine(i, { actual_qty: Number(e.target.value), status: Number(e.target.value) < l.standard_qty ? "kurang" : "match" })} />
-                          </TableCell>
-                          <TableCell>
+                <>
+                  {/* Mobile checklist layout */}
+                  <div className="block md:hidden space-y-3">
+                    {lines.map((l, i) => (
+                      <div key={l.linen_item_id} className="p-3 border rounded-lg bg-card text-card-foreground shadow-sm space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold text-sm">{l.item_name}</span>
+                          <Badge variant="outline">Std: {l.standard_qty}</Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-[10px] uppercase text-muted-foreground">Aktual</Label>
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                type="button"
+                                size="icon" 
+                                variant="outline" 
+                                className="h-8 w-8 shrink-0 select-none" 
+                                onClick={() => {
+                                  const val = Math.max(0, l.actual_qty - 1);
+                                  setLine(i, { actual_qty: val, status: val < l.standard_qty ? "kurang" : "match" });
+                                }}
+                              >
+                                -
+                              </Button>
+                              <Input 
+                                type="number" 
+                                min={0} 
+                                value={l.actual_qty} 
+                                className="h-8 text-center text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-1"
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  setLine(i, { actual_qty: val, status: val < l.standard_qty ? "kurang" : "match" });
+                                }}
+                              />
+                              <Button 
+                                type="button"
+                                size="icon" 
+                                variant="outline" 
+                                className="h-8 w-8 shrink-0 select-none" 
+                                onClick={() => {
+                                  const val = l.actual_qty + 1;
+                                  setLine(i, { actual_qty: val, status: val < l.standard_qty ? "kurang" : "match" });
+                                }}
+                              >
+                                +
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <Label className="text-[10px] uppercase text-muted-foreground">Status</Label>
                             <Select value={l.status} onValueChange={(v) => setLine(i, { status: v as LinenStatus })}>
-                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 {(["match","kurang","hilang","rusak","noda"] as LinenStatus[]).map((s) => (
-                                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
-                          </TableCell>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop checklist layout */}
+                  <div className="hidden md:block border rounded-md overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Item</TableHead>
+                          <TableHead className="w-20">Std</TableHead>
+                          <TableHead className="w-24">Actual</TableHead>
+                          <TableHead className="w-36">Status</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {lines.map((l, i) => (
+                          <TableRow key={l.linen_item_id}>
+                            <TableCell>{l.item_name}</TableCell>
+                            <TableCell>{l.standard_qty}</TableCell>
+                            <TableCell>
+                              <Input type="number" min={0} value={l.actual_qty}
+                                onChange={(e) => setLine(i, { actual_qty: Number(e.target.value), status: Number(e.target.value) < l.standard_qty ? "kurang" : "match" })} />
+                            </TableCell>
+                            <TableCell>
+                              <Select value={l.status} onValueChange={(v) => setLine(i, { status: v as LinenStatus })}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {(["match","kurang","hilang","rusak","noda"] as LinenStatus[]).map((s) => (
+                                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               )}
             </div>
             <DialogFooter>
@@ -323,7 +393,53 @@ function RoomCheckPage() {
       <Card>
         <CardHeader><CardTitle className="text-base">Riwayat</CardTitle></CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          {/* Mobile view of history */}
+          <div className="block md:hidden space-y-3">
+            {(checks ?? []).map((c) => (
+              <div key={c.id} className="p-3 border rounded-lg bg-card text-card-foreground shadow-sm space-y-2.5 text-xs">
+                <div className="flex justify-between border-b pb-2 items-center">
+                  <span className="font-semibold text-sm">Kamar {c.rooms?.room_number}</span>
+                  <Badge variant="secondary">{fmtDate(c.check_date)}</Badge>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Tipe Kamar:</span>
+                  <span className="font-medium">{c.rooms?.room_type}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Extra Bed:</span>
+                  <span className="font-medium">{c.extra_bed ? "Ya" : "Tidak"}</span>
+                </div>
+                <div className="space-y-1 py-1">
+                  <span className="text-muted-foreground text-[10px] uppercase font-medium">Item Linen:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {c.room_check_items?.map((ci: any) => (
+                      <Badge key={ci.id} variant="outline" className={cn(STATUS_COLOR[ci.status as LinenStatus] || "", "text-[10px] px-1.5 py-0.5")}>
+                        {ci.linen_items?.item_name}: {ci.actual_qty}/{ci.standard_qty}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                {c.notes && (
+                  <div className="bg-muted/40 p-2 rounded text-muted-foreground text-[11px] leading-relaxed">
+                    <strong>Catatan:</strong> {c.notes}
+                  </div>
+                )}
+                {canUndo(c.created_at) && (
+                  <div className="pt-2 border-t mt-1 flex justify-end">
+                    <Button size="sm" variant="destructive" className="h-8 px-3 text-xs" onClick={() => undoMutation.mutate(c)} disabled={undoMutation.isPending}>
+                      Undo (Batal)
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+            {(checks ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground py-6 text-center">Belum ada room check.</p>
+            )}
+          </div>
+
+          {/* Desktop view of history */}
+          <div className="hidden md:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>

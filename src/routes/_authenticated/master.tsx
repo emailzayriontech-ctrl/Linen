@@ -26,15 +26,15 @@ function MasterPage() {
   const { hasRole } = useAuth();
   if (!hasRole("admin")) return <Navigate to="/dashboard" />;
   return (
-    <Tabs defaultValue="rooms">
-      <TabsList>
-        <TabsTrigger value="rooms">Kamar</TabsTrigger>
-        <TabsTrigger value="items">Linen Items</TabsTrigger>
-        <TabsTrigger value="standards">Standar Linen</TabsTrigger>
-        <TabsTrigger value="users">Users & Roles</TabsTrigger>
-        <TabsTrigger value="qrcodes">QR Code Kamar</TabsTrigger>
-        <TabsTrigger value="tasks">Penugasan Kerja</TabsTrigger>
-        <TabsTrigger value="system">Kelola Sistem</TabsTrigger>
+    <Tabs defaultValue="rooms" className="w-full">
+      <TabsList className="w-full flex justify-start overflow-x-auto whitespace-nowrap h-auto p-1 bg-muted/60 gap-1 select-none">
+        <TabsTrigger value="rooms" className="text-xs md:text-sm shrink-0">Kamar</TabsTrigger>
+        <TabsTrigger value="items" className="text-xs md:text-sm shrink-0">Linen Items</TabsTrigger>
+        <TabsTrigger value="standards" className="text-xs md:text-sm shrink-0">Standar Linen</TabsTrigger>
+        <TabsTrigger value="users" className="text-xs md:text-sm shrink-0">Users & Roles</TabsTrigger>
+        <TabsTrigger value="qrcodes" className="text-xs md:text-sm shrink-0">QR Code Kamar</TabsTrigger>
+        <TabsTrigger value="tasks" className="text-xs md:text-sm shrink-0">Penugasan Kerja</TabsTrigger>
+        <TabsTrigger value="system" className="text-xs md:text-sm shrink-0">Kelola Sistem</TabsTrigger>
       </TabsList>
       <TabsContent value="rooms"><RoomsTab /></TabsContent>
       <TabsContent value="items"><ItemsTab /></TabsContent>
@@ -70,17 +70,19 @@ function RoomsTab() {
           <Input placeholder="Bed Type" value={f.bed_type} onChange={(e) => setF({ ...f, bed_type: e.target.value })} />
           <Button onClick={() => add.mutate()} disabled={add.isPending}>Tambah</Button>
         </div>
-        <Table>
-          <TableHeader><TableRow><TableHead>No.</TableHead><TableHead>Tipe</TableHead><TableHead>Bed</TableHead><TableHead></TableHead></TableRow></TableHeader>
-          <TableBody>
-            {data?.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{r.room_number}</TableCell><TableCell>{r.room_type}</TableCell><TableCell>{r.bed_type}</TableCell>
-                <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => del.mutate(r.id)}><Trash2 className="h-4 w-4" /></Button></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader><TableRow><TableHead>No.</TableHead><TableHead>Tipe</TableHead><TableHead>Bed</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <TableBody>
+              {data?.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{r.room_number}</TableCell><TableCell>{r.room_type}</TableCell><TableCell>{r.bed_type}</TableCell>
+                  <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => del.mutate(r.id)}><Trash2 className="h-4 w-4" /></Button></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
@@ -109,17 +111,19 @@ function ItemsTab() {
           <Input placeholder="Unit" value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} />
           <Button onClick={() => add.mutate()} disabled={add.isPending}>Tambah</Button>
         </div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Item</TableHead><TableHead>Kategori</TableHead><TableHead>Unit</TableHead><TableHead></TableHead></TableRow></TableHeader>
-          <TableBody>
-            {data?.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{r.item_name}</TableCell><TableCell>{r.category}</TableCell><TableCell>{r.unit}</TableCell>
-                <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => del.mutate(r.id)}><Trash2 className="h-4 w-4" /></Button></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader><TableRow><TableHead>Item</TableHead><TableHead>Kategori</TableHead><TableHead>Unit</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <TableBody>
+              {data?.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{r.item_name}</TableCell><TableCell>{r.category}</TableCell><TableCell>{r.unit}</TableCell>
+                  <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => del.mutate(r.id)}><Trash2 className="h-4 w-4" /></Button></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
@@ -151,18 +155,20 @@ function StandardsTab() {
           <Input type="number" placeholder="Qty" value={f.standard_qty} onChange={(e) => setF({ ...f, standard_qty: Number(e.target.value) })} />
           <Button onClick={() => upsert.mutate()} disabled={upsert.isPending}>Simpan</Button>
         </div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Tipe</TableHead><TableHead>Item</TableHead><TableHead>Qty</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {stds?.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{r.room_type}</TableCell>
-                <TableCell>{(r as { linen_items?: { item_name: string } }).linen_items?.item_name}</TableCell>
-                <TableCell>{r.standard_qty}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader><TableRow><TableHead>Tipe</TableHead><TableHead>Item</TableHead><TableHead>Qty</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {stds?.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{r.room_type}</TableCell>
+                  <TableCell>{(r as { linen_items?: { item_name: string } }).linen_items?.item_name}</TableCell>
+                  <TableCell>{r.standard_qty}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
@@ -244,31 +250,33 @@ function UsersTab() {
           <p className="text-xs text-muted-foreground">Password minimal 6 karakter. Sampaikan ke user untuk diganti setelah login.</p>
         </div>
 
-        <Table>
-          <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Email</TableHead><TableHead>Role</TableHead><TableHead></TableHead></TableRow></TableHeader>
-          <TableBody>
-            {profiles?.map((p) => {
-              const role = roles?.find((r) => r.user_id === p.id)?.role ?? "room_attendant";
-              return (
-                <TableRow key={p.id}>
-                  <TableCell>{p.full_name || "-"}</TableCell>
-                  <TableCell>{p.email}</TableCell>
-                  <TableCell>
-                    <Select value={role} onValueChange={(v) => setRole.mutate({ user_id: p.id, role: v as AppRole })}>
-                      <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
-                      <SelectContent>{ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => { if (confirm("Hapus user ini?")) removeUser.mutate(p.id); }}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Email</TableHead><TableHead>Role</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <TableBody>
+              {profiles?.map((p) => {
+                const role = roles?.find((r) => r.user_id === p.id)?.role ?? "room_attendant";
+                return (
+                  <TableRow key={p.id}>
+                    <TableCell>{p.full_name || "-"}</TableCell>
+                    <TableCell>{p.email}</TableCell>
+                    <TableCell>
+                      <Select value={role} onValueChange={(v) => setRole.mutate({ user_id: p.id, role: v as AppRole })}>
+                        <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+                        <SelectContent>{ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => { if (confirm("Hapus user ini?")) removeUser.mutate(p.id); }}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
@@ -455,39 +463,41 @@ function TaskAssignmentTab() {
           <Button onClick={() => add.mutate()} disabled={add.isPending}>Tugaskan</Button>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Petugas</TableHead>
-              <TableHead>No. Kamar</TableHead>
-              <TableHead>Tanggal</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {assignments?.map((a) => (
-              <TableRow key={a.id}>
-                <TableCell className="font-medium">{a.profiles?.full_name || a.profiles?.email || "-"}</TableCell>
-                <TableCell>Kamar {a.rooms?.room_number}</TableCell>
-                <TableCell>{a.assign_date}</TableCell>
-                <TableCell>
-                  <span className={cn(
-                    "text-xs px-2 py-0.5 rounded-full font-medium",
-                    a.status === "completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
-                  )}>
-                    {a.status === "completed" ? "Selesai" : "Pending"}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => del.mutate(a.id)} disabled={del.isPending}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </TableCell>
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Petugas</TableHead>
+                <TableHead>No. Kamar</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right"></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {assignments?.map((a) => (
+                <TableRow key={a.id}>
+                  <TableCell className="font-medium">{a.profiles?.full_name || a.profiles?.email || "-"}</TableCell>
+                  <TableCell>Kamar {a.rooms?.room_number}</TableCell>
+                  <TableCell>{a.assign_date}</TableCell>
+                  <TableCell>
+                    <span className={cn(
+                      "text-xs px-2 py-0.5 rounded-full font-medium",
+                      a.status === "completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                    )}>
+                      {a.status === "completed" ? "Selesai" : "Pending"}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" onClick={() => del.mutate(a.id)} disabled={del.isPending}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
@@ -559,51 +569,53 @@ function QrCodesTab() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>No. Kamar</TableHead>
-              <TableHead>Tipe</TableHead>
-              <TableHead>Kode QR</TableHead>
-              <TableHead>Visual QR</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rooms?.map((r) => {
-              const qr = qrs?.find((q) => q.room_id === r.id);
-              return (
-                <TableRow key={r.id}>
-                  <TableCell className="font-semibold">{r.room_number}</TableCell>
-                  <TableCell>{r.room_type}</TableCell>
-                  <TableCell>
-                    {qr ? (
-                      <code className="bg-muted px-1.5 py-0.5 rounded text-xs">{qr.qr_code}</code>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">Belum dibuat</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {qr ? (
-                      <div className="h-8 w-8 border-2 border-foreground/30 p-0.5 rounded flex items-center justify-center bg-white">
-                        <QrCode className="h-6 w-6 text-foreground" />
-                      </div>
-                    ) : (
-                      "—"
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {qr && (
-                      <Button variant="outline" size="sm" onClick={() => printQr(r.room_number, qr.qr_code)}>
-                        <Printer className="h-4 w-4 mr-1" /> Cetak QR
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>No. Kamar</TableHead>
+                <TableHead>Tipe</TableHead>
+                <TableHead>Kode QR</TableHead>
+                <TableHead>Visual QR</TableHead>
+                <TableHead className="text-right">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rooms?.map((r) => {
+                const qr = qrs?.find((q) => q.room_id === r.id);
+                return (
+                  <TableRow key={r.id}>
+                    <TableCell className="font-semibold">{r.room_number}</TableCell>
+                    <TableCell>{r.room_type}</TableCell>
+                    <TableCell>
+                      {qr ? (
+                        <code className="bg-muted px-1.5 py-0.5 rounded text-xs">{qr.qr_code}</code>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Belum dibuat</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {qr ? (
+                        <div className="h-8 w-8 border-2 border-foreground/30 p-0.5 rounded flex items-center justify-center bg-white">
+                          <QrCode className="h-6 w-6 text-foreground" />
+                        </div>
+                      ) : (
+                        "—"
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {qr && (
+                        <Button variant="outline" size="sm" onClick={() => printQr(r.room_number, qr.qr_code)}>
+                          <Printer className="h-4 w-4 mr-1" /> Cetak QR
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

@@ -131,7 +131,27 @@ export function CrudPage<TRow extends { id: string }>(props: {
       <Card>
         <CardHeader><CardTitle className="text-base">Riwayat</CardTitle></CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          {/* On Mobile viewports, render stack of cards */}
+          <div className="block md:hidden space-y-3">
+            {(rows ?? []).map((r) => (
+              <div key={r.id} className="p-3 border rounded-lg bg-card text-card-foreground shadow-sm space-y-2 text-xs">
+                {props.columns.map((c) => (
+                  <div key={c.key} className="flex justify-between border-b pb-1.5 last:border-0 last:pb-0 items-center gap-2">
+                    <span className="text-muted-foreground font-medium">{c.label}:</span>
+                    <span className="font-semibold text-right">
+                      {c.render ? c.render(r) : String((r as unknown as Record<string, unknown>)[c.key] ?? "")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+            {(rows ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground py-6 text-center">Belum ada data.</p>
+            )}
+          </div>
+
+          {/* On Desktop viewports, render standard table */}
+          <div className="hidden md:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>{props.columns.map((c) => <TableHead key={c.key}>{c.label}</TableHead>)}</TableRow>

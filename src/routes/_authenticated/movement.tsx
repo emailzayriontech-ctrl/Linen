@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { today, fmtDate } from "@/lib/format";
 import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 import { ArrowRight, RefreshCw, Plus, History, Route as RouteIcon, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/movement")({
@@ -221,34 +222,61 @@ function LinenMovementPage() {
             ) : movements?.length === 0 ? (
               <p className="text-sm text-muted-foreground py-6 text-center">Belum ada catatan perpindahan linen.</p>
             ) : (
-              <div className="overflow-x-auto border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Tanggal</TableHead>
-                      <TableHead>Item Linen</TableHead>
-                      <TableHead>Asal</TableHead>
-                      <TableHead></TableHead>
-                      <TableHead>Tujuan</TableHead>
-                      <TableHead className="text-right">Qty</TableHead>
-                      <TableHead>Petugas</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {movements?.map((m: any) => (
-                      <TableRow key={m.id}>
-                        <TableCell className="whitespace-nowrap">{fmtDate(m.movement_date)}</TableCell>
-                        <TableCell className="font-medium">{m.linen_items?.item_name || "—"}</TableCell>
-                        <TableCell><Badge variant="outline" className={LOCATION_COLOR[m.from_location]}>{m.from_location}</Badge></TableCell>
-                        <TableCell className="text-muted-foreground">&rarr;</TableCell>
-                        <TableCell><Badge variant="outline" className={LOCATION_COLOR[m.to_location]}>{m.to_location}</Badge></TableCell>
-                        <TableCell className="text-right font-semibold text-primary">{m.qty} pcs</TableCell>
-                        <TableCell className="text-xs text-muted-foreground">{m.profiles?.full_name || "Petugas"}</TableCell>
+              <>
+                {/* Mobile view of history */}
+                <div className="block md:hidden space-y-3">
+                  {movements?.map((m: any) => (
+                    <div key={m.id} className="p-3 border rounded-lg bg-card text-card-foreground shadow-sm space-y-2.5 text-xs">
+                      <div className="flex justify-between border-b pb-2 items-center">
+                        <span className="font-semibold text-sm">{m.linen_items?.item_name || "—"}</span>
+                        <span className="text-muted-foreground text-[10px]">{fmtDate(m.movement_date)}</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1">
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className={LOCATION_COLOR[m.from_location]}>{m.from_location}</Badge>
+                          <span className="text-muted-foreground">&rarr;</span>
+                          <Badge variant="outline" className={LOCATION_COLOR[m.to_location]}>{m.to_location}</Badge>
+                        </div>
+                        <span className="font-bold text-primary text-sm">{m.qty} pcs</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-muted-foreground border-t pt-1.5 mt-1">
+                        <span>Petugas:</span>
+                        <span className="font-medium text-foreground">{m.profiles?.full_name || "—"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop view of history */}
+                <div className="hidden md:block overflow-x-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tanggal</TableHead>
+                        <TableHead>Item Linen</TableHead>
+                        <TableHead>Asal</TableHead>
+                        <TableHead></TableHead>
+                        <TableHead>Tujuan</TableHead>
+                        <TableHead className="text-right">Qty</TableHead>
+                        <TableHead>Petugas</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {movements?.map((m: any) => (
+                        <TableRow key={m.id}>
+                          <TableCell className="whitespace-nowrap">{fmtDate(m.movement_date)}</TableCell>
+                          <TableCell className="font-medium">{m.linen_items?.item_name || "—"}</TableCell>
+                          <TableCell><Badge variant="outline" className={LOCATION_COLOR[m.from_location]}>{m.from_location}</Badge></TableCell>
+                          <TableCell className="text-muted-foreground">&rarr;</TableCell>
+                          <TableCell><Badge variant="outline" className={LOCATION_COLOR[m.to_location]}>{m.to_location}</Badge></TableCell>
+                          <TableCell className="text-right font-semibold text-primary">{m.qty} pcs</TableCell>
+                          <TableCell className="text-xs text-muted-foreground">{m.profiles?.full_name || "Petugas"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
