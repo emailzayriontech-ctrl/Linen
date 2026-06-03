@@ -226,10 +226,10 @@ function RoomCheckPage() {
           <DialogTrigger asChild>
             <Button><Plus className="h-4 w-4 mr-1" />Room Check Baru</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[calc(100%-1.5rem)] max-w-2xl max-h-[92vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader><DialogTitle>Form Room Check</DialogTitle></DialogHeader>
             <div className="grid gap-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Tanggal</Label>
                   <Input type="date" value={form.check_date} onChange={(e) => setForm({ ...form, check_date: e.target.value })} />
@@ -307,7 +307,7 @@ function RoomCheckPage() {
                                 type="number" 
                                 min={0} 
                                 value={l.actual_qty} 
-                                className="h-8 text-center text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-1"
+                                className="h-8 w-12 text-center text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-1 shrink-0"
                                 onChange={(e) => {
                                   const val = Number(e.target.value);
                                   setLine(i, { actual_qty: val, status: val < l.standard_qty ? "kurang" : "match" });
